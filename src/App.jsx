@@ -24,8 +24,19 @@ class BookList extends Component {
         },
       ],
       selectedBooks: [],
+      error: false,
     };
   }
+
+  _renderError = () => {
+    if (this.state.error) {
+      return (
+        <div className="alert alert-danger">
+          {this.state.error}
+        </div>
+      );
+    }
+  };
 
   handleSelectedBooks = (event) => {
     const { selectedBooks } = this.state;
@@ -58,12 +69,21 @@ class BookList extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    this.props.updateFormData({
-      selectedBooks: this.state.selectedBooks,
-    });
+
+    if (this.state.selectedBooks.length === 0) {
+      this.setState({ error: 'Please choose at least one book to continue' });
+    } else {
+      this.setState({ error: false });
+      this.props.updateFormData({
+        selectedBooks: this.state
+          .selectedBooks,
+      });
+    }
   };
 
   render() {
+    const errorMessage = this._renderError();
+
     return (
       <div>
         <h3>
@@ -71,6 +91,7 @@ class BookList extends Component {
           Choose from wide variety of books available in our
           store
         </h3>
+        {errorMessage}
         <form onSubmit={this.handleSubmit}>
           {this.state.books.map((book) => this._renderBook(book))}
           <input
