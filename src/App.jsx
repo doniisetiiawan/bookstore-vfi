@@ -219,8 +219,152 @@ class ShippingDetails extends Component {
   }
 }
 
-function DeliveryDetails() {
-  return <h1>Choose your delivery options here.</h1>;
+class DeliveryDetails extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      deliveryOption: 'Primary',
+    };
+  }
+
+  handleChange = (event) => {
+    this.setState({ deliveryOption: event.target.value });
+  };
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    this.props.updateFormData(this.state);
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>Choose your delivery options here.</h1>
+        <div style={{ width: 200 }}>
+          <form onSubmit={this.handleSubmit}>
+            <div className="radio">
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label>
+                <input
+                  type="radio"
+                  checked={
+                    this.state.deliveryOption === 'Primary'
+                  }
+                  value="Primary"
+                  onChange={this.handleChange}
+                />
+                Primary -- Next day delivery
+              </label>
+            </div>
+            <div className="radio">
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              <label>
+                <input
+                  type="radio"
+                  checked={
+                    this.state.deliveryOption === 'Normal'
+                  }
+                  value="Normal"
+                  onChange={this.handleChange}
+                />
+                Normal -- 3-4 days
+              </label>
+            </div>
+            <button
+              type="submit"
+              className="btn btn-success"
+            >
+              Submit
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+}
+
+class Confirmation extends Component {
+  handleSubmit = (event) => {
+    event.preventDefault();
+    this.props.updateFormData(this.props.data);
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>Are you sure you want to submit the data?</h1>
+        <form onSubmit={this.handleSubmit}>
+          <div>
+            <strong>Full Name</strong>
+            {' '}
+            :
+            {this.props.data.fullName}
+          </div>
+          <br />
+          <div>
+            <strong>Contact Number</strong>
+            {' '}
+            :
+            {this.props.data.contactNumber}
+          </div>
+          <br />
+          <div>
+            <strong>Shipping Address</strong>
+            {' '}
+            :
+            {this.props.data.shippingAddress}
+          </div>
+          <br />
+          <div>
+            <strong>Selected books</strong>
+            {' '}
+            :
+            {this.props.data.selectedBooks.join(', ')}
+          </div>
+          <br />
+          <button type="submit" className="btn btn-success">
+            Place order
+          </button>
+        </form>
+      </div>
+    );
+  }
+}
+
+class Success extends Component {
+  render() {
+    let numberOfDays = '1 to 2 ';
+
+    if (this.props.data.deliveryOption === 'Normal') {
+      numberOfDays = '3 to 4 ';
+    }
+
+    return (
+      <div>
+        <h2>
+          Thank you for shopping with us
+          {' '}
+          {this.props.data.fullName}
+          .
+        </h2>
+        <h4>
+          You will soon get
+          {' '}
+          {this.props.data.selectedBooks.join(', ')}
+          at
+          {' '}
+          {this.props.data.shippingAddress}
+          {' '}
+          in
+          approrximately
+          {' '}
+          {numberOfDays}
+          days.
+        </h4>
+      </div>
+    );
+  }
 }
 
 class App extends Component {
@@ -246,7 +390,6 @@ class App extends Component {
   };
 
   render() {
-    // eslint-disable-next-line default-case
     switch (this.state.currentStep) {
       case 1:
         return (
@@ -263,6 +406,19 @@ class App extends Component {
           <DeliveryDetails
             updateFormData={this.updateFormData}
           />
+        );
+      case 4:
+        return (
+          <Confirmation
+            data={this.state.formValues}
+            updateFormData={this.updateFormData}
+          />
+        );
+      case 5:
+        return <Success data={this.state.formValues} />;
+      default:
+        return (
+          <BookList updateFormData={this.updateFormData} />
         );
     }
   }
