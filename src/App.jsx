@@ -23,7 +23,7 @@ class BookList extends Component {
           author: 'A.P.J. Abdul Kalam',
         },
       ],
-      selectedBooks: []
+      selectedBooks: [],
     };
   }
 
@@ -35,7 +35,7 @@ class BookList extends Component {
     } else {
       selectedBooks.splice(index, 1);
     }
-    console.log(selectedBooks);
+    // console.log(selectedBooks);
     this.setState({ selectedBooks });
   };
 
@@ -57,9 +57,10 @@ class BookList extends Component {
   );
 
   handleSubmit = (event) => {
-    console.log(event);
     event.preventDefault();
-    console.log('Form submitted');
+    this.props.updateFormData({
+      selectedBooks: this.state.selectedBooks,
+    });
   };
 
   render() {
@@ -96,18 +97,41 @@ class App extends Component {
 
     this.state = {
       currentStep: 1,
+      formValues: {},
     };
   }
+
+  updateFormData = (formData) => {
+    const formValues = {
+      // eslint-disable-next-line react/no-access-state-in-setstate
+      ...this.state.formValues,
+      ...formData,
+    };
+    // eslint-disable-next-line react/no-access-state-in-setstate
+    const nextStep = this.state.currentStep + 1;
+    this.setState({ currentStep: nextStep, formValues });
+    console.log(formValues);
+  };
 
   render() {
     // eslint-disable-next-line default-case
     switch (this.state.currentStep) {
       case 1:
-        return <BookList />;
+        return (
+          <BookList updateFormData={this.updateFormData} />
+        );
       case 2:
-        return <ShippingDetails />;
+        return (
+          <ShippingDetails
+            updateFormData={this.updateFormData}
+          />
+        );
       case 3:
-        return <DeliveryDetails />;
+        return (
+          <DeliveryDetails
+            updateFormData={this.updateFormData}
+          />
+        );
     }
   }
 }
