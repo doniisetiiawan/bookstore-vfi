@@ -4,13 +4,41 @@ export default class ShippingDetails extends Component {
   constructor(props) {
     super(props);
 
+    this.intervals = [];
     this.state = {
       fullName: '',
       contactNumber: '',
       shippingAddress: '',
       error: false,
+      cartTimeout: this.props.cartTimeout,
     };
   }
+
+  // eslint-disable-next-line camelcase
+  UNSAFE_componentWillMount = () => {
+    this.setInterval(this.decrementCartTimer, 1000);
+  };
+
+  setInterval = (...args) => {
+    // eslint-disable-next-line prefer-spread
+    this.intervals.push(setInterval.apply(null, args));
+  };
+
+  decrementCartTimer = () => {
+    if (this.state.cartTimeout == 0) {
+      this.props.alertCartTimeout();
+      return;
+    }
+    this.setState({
+      // eslint-disable-next-line react/no-access-state-in-setstate
+      cartTimeout: this.state.cartTimeout - 1,
+    });
+  };
+
+  componentWillUnmount = () => {
+    this.intervals.map(clearInterval);
+    this.props.updateCartTimeout(this.state.cartTimeout);
+  };
 
   _renderError = () => {
     if (this.state.error) {
@@ -61,6 +89,8 @@ export default class ShippingDetails extends Component {
 
   render() {
     const errorMessage = this._renderError();
+    const minutes = Math.floor(this.state.cartTimeout / 60);
+    const seconds = this.state.cartTimeout - minutes * 60;
 
     return (
       <div>
@@ -107,6 +137,24 @@ export default class ShippingDetails extends Component {
               </button>
             </div>
           </form>
+        </div>
+
+        <div className="well">
+          <span
+            className="glyphicon glyphicon-time"
+            aria-hidden="true"
+          />
+          {' '}
+          You have
+          {' '}
+          {minutes}
+          {' '}
+          Minutes,
+          {' '}
+          {seconds}
+          {' '}
+          Seconds,
+          before confirming order
         </div>
       </div>
     );

@@ -13,8 +13,17 @@ class App extends Component {
     this.state = {
       currentStep: 1,
       formValues: {},
+      cartTimeout: 60,
     };
   }
+
+  updateCartTimeout = (timeout) => {
+    this.setState({ cartTimeout: timeout });
+  };
+
+  alertCartTimeout = () => {
+    this.setState({ currentStep: 10 });
+  };
 
   updateFormData = (formData) => {
     const formValues = {
@@ -38,12 +47,18 @@ class App extends Component {
         return (
           <ShippingDetails
             updateFormData={this.updateFormData}
+            cartTimeout={this.state.cartTimeout}
+            updateCartTimeout={this.updateCartTimeout}
+            alertCartTimeout={this.alertCartTimeout}
           />
         );
       case 3:
         return (
           <DeliveryDetails
             updateFormData={this.updateFormData}
+            cartTimeout={this.state.cartTimeout}
+            updateCartTimeout={this.updateCartTimeout}
+            alertCartTimeout={this.alertCartTimeout}
           />
         );
       case 4:
@@ -51,10 +66,22 @@ class App extends Component {
           <Confirmation
             data={this.state.formValues}
             updateFormData={this.updateFormData}
+            cartTimeout={this.state.cartTimeout}
           />
         );
       case 5:
-        return <Success data={this.state.formValues} />;
+        return (
+          <Success
+            data={this.state.formValues}
+            cartTimeout={this.state.cartTimeout}
+          />
+        );
+      case 10:
+        return (
+          <div>
+            <h2>Your cart timed out, Please try again!</h2>
+          </div>
+        );
       default:
         return (
           <BookList updateFormData={this.updateFormData} />
